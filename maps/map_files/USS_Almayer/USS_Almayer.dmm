@@ -63614,7 +63614,6 @@
 /obj/structure/prop/invuln/overhead_pipe{
 	pixel_x = 12
 	},
-/obj/structure/machinery/cm_vending/own_points/experimental_tools,
 /turf/open/floor/almayer,
 /area/almayer/living/synthcloset)
 "rJK" = (
