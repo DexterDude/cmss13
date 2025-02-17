@@ -66,7 +66,7 @@
 /mob/living/proc/burn_skin(burn_amount)
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src //make this damage method divide the damage to be done among all the body parts, then burn each body part for that much damage. will have better effect then just randomly picking a body part
-		var/divided_damage = (burn_amount)/(H.limbs.len)
+		var/divided_damage = (burn_amount)/(length(H.limbs))
 		var/extradam = 0 //added to when organ is at max dam
 		for(var/obj/limb/affecting in H.limbs)
 			if(!affecting) continue
@@ -388,20 +388,23 @@
 			if(loc && !loc.Adjacent(L.loc))
 				now_pushing = FALSE
 				return
-			var/oldloc = loc
-			var/oldLloc = L.loc
 
-			L.add_temp_pass_flags(PASS_MOB_THRU)
-			add_temp_pass_flags(PASS_MOB_THRU)
+			if(!(L.pass_flags.flags_pass & PASS_MOB_THRU)) //if they already pass through mob thi stuff is unnecessary
 
-			L.Move(oldloc)
-			Move(oldLloc)
+				var/oldloc = loc
+				var/oldLloc = L.loc
 
-			remove_temp_pass_flags(PASS_MOB_THRU)
-			L.remove_temp_pass_flags(PASS_MOB_THRU)
+				L.add_temp_pass_flags(PASS_MOB_THRU)
+				add_temp_pass_flags(PASS_MOB_THRU)
 
-			now_pushing = FALSE
-			return
+				L.Move(oldloc)
+				Move(oldLloc)
+
+				remove_temp_pass_flags(PASS_MOB_THRU)
+				L.remove_temp_pass_flags(PASS_MOB_THRU)
+
+				now_pushing = FALSE
+				return
 
 	now_pushing = FALSE
 
@@ -460,16 +463,19 @@
 /mob/proc/flash_eyes()
 	return
 
-/mob/living/flash_eyes(intensity = EYE_PROTECTION_FLASH, bypass_checks, type = /atom/movable/screen/fullscreen/flash, flash_timer = 40)
-	if( bypass_checks || (get_eye_protection() < intensity && !(sdisabilities & DISABILITY_BLIND)))
-		overlay_fullscreen("flash", type)
+/mob/living/flash_eyes(intensity = EYE_PROTECTION_FLASH, bypass_checks, flash_timer = 40, type = /atom/movable/screen/fullscreen/flash, dark_type = /atom/movable/screen/fullscreen/flash/dark)
+	if(bypass_checks || (get_eye_protection() < intensity && !(sdisabilities & DISABILITY_BLIND)))
+		if(client?.prefs?.flash_overlay_pref == FLASH_OVERLAY_DARK)
+			overlay_fullscreen("flash", dark_type)
+		else
+			overlay_fullscreen("flash", type)
 		spawn(flash_timer)
 			clear_fullscreen("flash", 20)
 		return TRUE
 
 /mob/living/create_clone_movable(shift_x, shift_y)
 	..()
-	src.clone.hud_list = new /list(src.hud_list.len)
+	src.clone.hud_list = new /list(length(src.hud_list))
 	for(var/h in src.hud_possible) //Clone HUD
 		src.clone.hud_list[h] = new /image("loc" = src.clone, "icon" = src.hud_list[h].icon)
 
@@ -500,12 +506,10 @@
 		if(CONSCIOUS)
 			if(stat >= UNCONSCIOUS)
 				ADD_TRAIT(src, TRAIT_IMMOBILIZED, TRAIT_KNOCKEDOUT)
-				sound_environment_override = SOUND_ENVIRONMENT_PSYCHOTIC
 			add_traits(list(/*TRAIT_HANDS_BLOCKED, */ TRAIT_INCAPACITATED, TRAIT_FLOORED), STAT_TRAIT)
 		if(UNCONSCIOUS)
 			if(stat >= UNCONSCIOUS)
 				ADD_TRAIT(src, TRAIT_IMMOBILIZED, TRAIT_KNOCKEDOUT) //adding trait sources should come before removing to avoid unnecessary updates
-				sound_environment_override = SOUND_ENVIRONMENT_PSYCHOTIC
 		if(DEAD)
 			SEND_SIGNAL(src, COMSIG_MOB_STAT_SET_ALIVE)
 //			remove_from_dead_mob_list()
@@ -515,12 +519,10 @@
 		if(CONSCIOUS)
 			if(. >= UNCONSCIOUS)
 				REMOVE_TRAIT(src, TRAIT_IMMOBILIZED, TRAIT_KNOCKEDOUT)
-				sound_environment_override = SOUND_ENVIRONMENT_NONE
 			remove_traits(list(/*TRAIT_HANDS_BLOCKED, */ TRAIT_INCAPACITATED, TRAIT_FLOORED, /*TRAIT_CRITICAL_CONDITION*/), STAT_TRAIT)
 		if(UNCONSCIOUS)
 			if(. >= UNCONSCIOUS)
 				REMOVE_TRAIT(src, TRAIT_IMMOBILIZED, TRAIT_KNOCKEDOUT)
-				sound_environment_override = SOUND_ENVIRONMENT_NONE
 		if(DEAD)
 			SEND_SIGNAL(src, COMSIG_MOB_STAT_SET_DEAD)
 //			REMOVE_TRAIT(src, TRAIT_CRITICAL_CONDITION, STAT_TRAIT)
@@ -633,6 +635,7 @@
 		return
 	. = body_position
 	body_position = new_value
+	body_position_changed = world.time
 	SEND_SIGNAL(src, COMSIG_LIVING_SET_BODY_POSITION, new_value, .)
 	if(new_value == LYING_DOWN) // From standing to lying down.
 		on_lying_down()

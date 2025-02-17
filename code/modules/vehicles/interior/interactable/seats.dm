@@ -4,7 +4,7 @@
 
 	unacidable = TRUE
 	unslashable = TRUE
-	indestructible = TRUE
+	explo_proof = TRUE
 	can_rotate = FALSE
 
 	//you want these chairs to not be easily obscured by objects
@@ -108,8 +108,6 @@
 				to_chat(user, SPAN_WARNING("You are unable to use heavy weaponry."))
 			return
 
-		if(!HAS_TRAIT(user, TRAIT_OPPOSABLE_THUMBS))
-			return
 	for(var/obj/item/I in user.contents)		//prevents shooting while zoomed in, but zoom can still be activated and used without shooting
 		if(I.zoom)
 			I.zoom(user)
@@ -433,7 +431,7 @@
 //MISC
 
 /obj/structure/bed/chair/vehicle/ex_act(severity)
-	if(broken || indestructible)
+	if(broken || explo_proof)
 		return
 	switch(severity)
 		if(0 to EXPLOSION_THRESHOLD_LOW)
@@ -444,3 +442,10 @@
 				break_seat()
 		if(EXPLOSION_THRESHOLD_MEDIUM to INFINITY)
 			break_seat()
+
+// White chairs
+
+/obj/structure/bed/chair/vehicle/white
+	name = "passenger seat"
+	desc = "A sturdy chair with a brace that lowers over your body. Prevents being flung around in vehicle during crash being injured as a result. Fasten your seatbelts, kids! Fix with welding tool in case of damage."
+	icon = 'icons/obj/vehicles/interiors/whitechair.dmi'

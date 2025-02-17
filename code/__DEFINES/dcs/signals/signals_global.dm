@@ -66,12 +66,24 @@
 /// From
 #define COMSIG_GLOB_YAUTJA_ARMORY_OPENED "!yautja_armory_opened"
 
+/// For opening hunting grounds shutters
+#define COMSIG_GLOB_YAUTJA_PRESERVE_OPENED "!yautja_preserve_opened"
+
+/// For closing hunting grounds shutters
+#define COMSIG_GLOB_YAUTJA_PRESERVE_CLOSED "!yautja_preserve_closed"
+
 /// From /proc/biohazard_lockdown()
 #define COMSIG_GLOB_RESEARCH_LOCKDOWN "!research_lockdown_closed"
 #define COMSIG_GLOB_RESEARCH_LIFT "!research_lockdown_opened"
+/// From /proc/aicore_lockdown()
+#define COMSIG_GLOB_AICORE_LOCKDOWN "!aicore_lockdown_closed"
+#define COMSIG_GLOB_AICORE_LIFT "!aicore_lockdown_opened"
 
 /// From /obj/structure/machinery/power/reactor/proc/set_overloading() : (set_overloading)
 #define COMSIG_GLOB_GENERATOR_SET_OVERLOADING "!generator_set_overloading"
 
 #define COMSIG_GLOB_HIJACK_IMPACTED "!hijack_impacted"
 #define COMSIG_GLOB_HIJACK_LANDED "!hijack_landed"
+
+/// From /datum/controller/subsystem/hijack/fire()
+#define COMSIG_GLOB_FUEL_PUMP_UPDATE "!fuel_pump_update"

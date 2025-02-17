@@ -28,12 +28,6 @@
 				help_shake_act(attacking_mob)
 				return 1
 
-			if(attacking_mob.head && (attacking_mob.head.flags_inventory & COVERMOUTH) || attacking_mob.wear_mask && (attacking_mob.wear_mask.flags_inventory & COVERMOUTH) && !(attacking_mob.wear_mask.flags_inventory & ALLOWCPR))
-				to_chat(attacking_mob, SPAN_NOTICE("<B>Remove your mask!</B>"))
-				return 0
-			if(head && (head.flags_inventory & COVERMOUTH) || wear_mask && (wear_mask.flags_inventory & COVERMOUTH) && !(wear_mask.flags_inventory & ALLOWCPR))
-				to_chat(attacking_mob, SPAN_NOTICE("<B>Remove [src.gender==MALE?"his":"her"] mask!</B>"))
-				return 0
 			if(cpr_attempt_timer >= world.time)
 				to_chat(attacking_mob, SPAN_NOTICE("<B>CPR is already being performed on [src]!</B>"))
 				return 0
@@ -209,7 +203,10 @@
 		if(client)
 			sleeping = max(0,src.sleeping-5)
 		if(!sleeping)
-			set_resting(FALSE)
+			if(is_dizzy)
+				to_chat(M, SPAN_WARNING("[src] looks dizzy. Maybe you should let [t_him] rest a bit longer."))
+			else
+				set_resting(FALSE)
 		M.visible_message(SPAN_NOTICE("[M] shakes [src] trying to wake [t_him] up!"), \
 			SPAN_NOTICE("You shake [src] trying to wake [t_him] up!"), null, 4)
 	else if(HAS_TRAIT(src, TRAIT_INCAPACITATED))

@@ -3,6 +3,11 @@
 	desc = "Dance my monkeys! DANCE!!!"
 	icon_state = "electropack0"
 	item_state = "electropack"
+	item_icons = list(
+		WEAR_L_HAND = 'icons/mob/humans/onmob/inhands/clothing/backpacks_lefthand.dmi',
+		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/clothing/backpacks_righthand.dmi',
+		WEAR_BACK = 'icons/mob/humans/onmob/clothing/back/misc.dmi'
+	)
 	frequency = 1457
 	flags_atom = FPRINT|CONDUCT
 	flags_equip_slot = SLOT_BACK
@@ -35,7 +40,7 @@
 		else
 			if(href_list["code"])
 				code += text2num(href_list["code"])
-				code = round(code)
+				code = floor(code)
 				code = min(100, code)
 				code = max(1, code)
 			else
@@ -90,7 +95,7 @@
 		return
 	user.set_interaction(src)
 	var/dat = {"<TT>
-<A href='?src=\ref[src];power=1'>Turn [on ? "Off" : "On"]</A><BR>
+<A href='byond://?src=\ref[src];power=1'>Turn [on ? "Off" : "On"]</A><BR>
 <B>Frequency/Code</B> for electropack:<BR>
 Frequency: [format_frequency(frequency)] kHz<BR>
 

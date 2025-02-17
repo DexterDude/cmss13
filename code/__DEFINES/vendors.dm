@@ -40,6 +40,7 @@
 #define VENDOR_THEME_USCM 1
 #define VENDOR_THEME_CLF 2
 #define VENDOR_THEME_UPP 3
+#define VENDOR_THEME_YAUTJA 4
 
 #define VENDOR_ITEM_REGULAR 1
 #define VENDOR_ITEM_MANDATORY 2
@@ -72,6 +73,8 @@
 /// Vendors with this flag will fill retroactively based on latejoining players,
 /// and expect a scale multiplier instead of amount of items
 #define VEND_STOCK_DYNAMIC (1<<10)
+/// Vends props looking like the items instead of the actual items. Basically for tutorials.
+#define VEND_PROPS (1<<11)
 
 // Redemption Tokens
 #define VEND_TOKEN_ENGINEER "Engineer"

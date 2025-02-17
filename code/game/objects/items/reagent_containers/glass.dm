@@ -7,6 +7,10 @@
 	var/base_name = " "
 	desc = " "
 	icon = 'icons/obj/items/chemistry.dmi'
+	item_icons = list(
+		WEAR_L_HAND = 'icons/mob/humans/onmob/inhands/items/bottles_lefthand.dmi',
+		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/items/bottles_righthand.dmi'
+	)
 	icon_state = null
 	item_state = null
 	amount_per_transfer_from_this = 10
@@ -219,7 +223,7 @@
 	if(reagents && reagents.total_volume)
 		var/image/filling = image('icons/obj/items/reagentfillings.dmi', src, "[icon_state]-20")
 
-		var/percent = round((reagents.total_volume / volume) * 100)
+		var/percent = floor((reagents.total_volume / volume) * 100)
 		switch(percent)
 			if(0) filling.icon_state = null
 			if(1 to 20) filling.icon_state = "[icon_state]-20"
@@ -307,7 +311,7 @@
 	overlays.Cut()
 	if(reagents && reagents.total_volume)
 		var/image/filling = image('icons/obj/items/reagentfillings.dmi', src, "[icon_state]10")
-		var/percent = round((reagents.total_volume / volume) * 100)
+		var/percent = floor((reagents.total_volume / volume) * 100)
 		var/round_percent = 0
 		if(percent > 24) round_percent = round(percent, 25)
 		else round_percent = 10
@@ -319,6 +323,7 @@
 	name = "large beaker"
 	desc = "A large beaker. Can hold up to 120 units."
 	icon_state = "beakerlarge"
+	item_state = "beakerlarge"
 	matter = list("glass" = 5000)
 	volume = 120
 	amount_per_transfer_from_this = 10
@@ -328,6 +333,7 @@
 	name = "large silver beaker"
 	desc = "A large silver beaker. Can hold up to 240 units. The beaker itself acts as a silver catalyst."
 	icon_state = "beakersilver"
+	item_state = "beakersilver"
 	volume = 240
 	matter = list("silver" = 5000)
 	amount_per_transfer_from_this = 10
@@ -347,6 +353,7 @@
 	name = "high-capacity beaker"
 	desc = "A beaker with an enlarged holding capacity, made with blue-tinted plexiglass in order to withstand greater pressure. Can hold up to 300 units."
 	icon_state = "beakerbluespace"
+	item_state = "beakerbluespace"
 	matter = list("glass" = 10000)
 	volume = 300
 	amount_per_transfer_from_this = 10
@@ -357,6 +364,7 @@
 	name = "vial"
 	desc = "A small glass vial. Can hold up to 30 units."
 	icon_state = "vial"
+	item_state = "vial"
 	volume = 30
 	amount_per_transfer_from_this = 10
 	matter = list()
@@ -364,6 +372,14 @@
 	flags_atom = FPRINT|OPENCONTAINER
 	ground_offset_x = 9
 	ground_offset_y = 8
+
+/obj/item/reagent_container/glass/beaker/vial/epinephrine
+	name = "epinephrine vial"
+
+/obj/item/reagent_container/glass/beaker/vial/epinephrine/Initialize()
+	. = ..()
+	reagents.add_reagent("adrenaline", 30)
+	update_icon()
 
 /obj/item/reagent_container/glass/beaker/vial/tricordrazine
 	name = "tricordrazine vial"
@@ -477,8 +493,13 @@
 	name = "Hydrogen canister"
 	desc = "A canister containing pressurized hydrogen. Can be used to refill storage tanks."
 	icon = 'icons/obj/items/tank.dmi'
+	item_icons = list(
+		WEAR_L_HAND = 'icons/mob/humans/onmob/inhands/equipment/tanks_lefthand.dmi',
+		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/equipment/tanks_righthand.dmi',
+		WEAR_BACK = 'icons/mob/humans/onmob/clothing/back/misc.dmi'
+	)
 	icon_state = "canister_hydrogen"
-	item_state = "anesthetic"
+	item_state = "canister_hydrogen"
 	amount_per_transfer_from_this = 100
 	possible_transfer_amounts = list(50,100,200,300,400)
 	volume = 400
@@ -498,24 +519,28 @@
 	name = "Ammonia canister"
 	desc = "A canister containing pressurized ammonia. Can be used to refill storage tanks."
 	icon_state = "canister_ammonia"
+	item_state = "canister_ammonia"
 	reagent = "ammonia"
 
 /obj/item/reagent_container/glass/canister/methane
 	name = "Methane canister"
 	desc = "A canister containing pressurized methane. Can be used to refill storage tanks."
 	icon_state = "canister_methane"
+	item_state = "canister_methane"
 	reagent = "methane"
 
 /obj/item/reagent_container/glass/canister/pacid
 	name = "Polytrinic acid canister"
 	desc = "A canister containing pressurized polytrinic acid. Can be used to refill storage tanks."
 	icon_state = "canister_pacid"
+	item_state = "canister_pacid"
 	reagent = "pacid"
 
 /obj/item/reagent_container/glass/canister/oxygen
 	name = "Oxygen canister"
 	desc = "A canister containing pressurized oxygen. Can be used to refill storage tanks."
 	icon_state = "canister_oxygen"
+	item_state = "canister_oxygen"
 	reagent = "oxygen"
 
 /obj/item/reagent_container/glass/pressurized_canister // See the Pressurized Reagent Canister Pouch
@@ -544,10 +569,6 @@
 		return
 	. = ..()
 
-/obj/item/reagent_container/glass/pressurized_canister/set_APTFT()
-	to_chat(usr, SPAN_WARNING("[src] has no transfer control valve! Use a dispenser to fill it!"))
-	return
-
 /obj/item/reagent_container/glass/pressurized_canister/on_reagent_change()
 	update_icon()
 
@@ -561,6 +582,10 @@
 	desc = "It's a bucket. Holds 120 units."
 	name = "bucket"
 	icon = 'icons/obj/janitor.dmi'
+	item_icons = list(
+		WEAR_L_HAND = 'icons/mob/humans/onmob/inhands/equipment/janitor_lefthand.dmi',
+		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/equipment/janitor_righthand.dmi',
+	)
 	icon_state = "bucket"
 	item_state = "bucket"
 	matter = list("metal" = 2000)
@@ -611,7 +636,7 @@
 	if(reagents && reagents.total_volume)
 		var/image/filling = image('icons/obj/items/reagentfillings.dmi', src, "[icon_state]-00-65")
 
-		var/percent = round((reagents.total_volume / volume) * 100)
+		var/percent = floor((reagents.total_volume / volume) * 100)
 		switch(percent)
 			if(0 to 33) filling.icon_state = "[icon_state]-00-33"
 			if(34 to 65) filling.icon_state = "[icon_state]-34-65"
@@ -628,6 +653,7 @@
 	name = "mop bucket"
 	desc = "A larger bucket, typically used with a mop. Holds 240 units"
 	icon_state = "mopbucket"
+	item_state = "mopbucket"
 	matter = list("metal" = 4000)
 	w_class = SIZE_LARGE
 	amount_per_transfer_from_this = 20
@@ -639,6 +665,7 @@
 	name = "janitorial bucket"
 	desc = "It's a large bucket that fits in a janitorial cart. Holds 500 units."
 	icon_state = "janibucket"
+	item_state = "janibucket"
 	matter = list("metal" = 8000)
 	volume = 500
 
@@ -647,7 +674,7 @@
 	name = "damp rag"
 	desc = "For cleaning up messes, you suppose."
 	w_class = SIZE_TINY
-	icon = 'icons/obj/items/items.dmi'
+	icon = 'icons/obj/janitor.dmi'
 	icon_state = "rag"
 	amount_per_transfer_from_this = 5
 	possible_transfer_amounts = list(5)

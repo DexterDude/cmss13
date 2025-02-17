@@ -181,13 +181,13 @@
 		last_damage_mult = 1
 
 	if(effective_range_min && distance_travelled < effective_range_min)
-		return max(0, damage - round((effective_range_min - distance_travelled) * damage_buildup))
+		return max(0, damage - floor((effective_range_min - distance_travelled) * damage_buildup))
 	else if(distance_travelled > effective_range_max)
-		return max(0, damage - round((distance_travelled - effective_range_max) * damage_falloff))
+		return max(0, damage - floor((distance_travelled - effective_range_max) * damage_falloff))
 	return damage
 
 // Target, firer, shot from (i.e. the gun), projectile range, projectile speed, original target (who was aimed at, not where projectile is going towards)
-/obj/projectile/proc/fire_at(atom/target, atom/F, atom/S, range = 30, speed = 1, atom/original_override)
+/obj/projectile/proc/fire_at(atom/target, atom/F, atom/S, range = 30, speed = 1, atom/original_override, randomize_speed = TRUE)
 	SHOULD_NOT_SLEEP(TRUE)
 	original = original || original_override || target
 	if(!loc)
@@ -211,8 +211,8 @@
 
 	if(F && !(projectile_flags & PROJECTILE_SHRAPNEL))
 		permutated |= F //Don't hit the shooter (firer)
-	else if (S && (projectile_flags & PROJECTILE_SHRAPNEL))
-		permutated |= S
+	if (S)
+		permutated |= get_atom_on_turf(S) //Don't hit the originating object
 
 	permutated |= src //Don't try to hit self.
 	shot_from = S
@@ -230,6 +230,7 @@
 
 	//If we have the right kind of ammo, we can fire several projectiles at once.
 	if(ammo.bonus_projectiles_amount && ammo.bonus_projectiles_type)
+		randomize_speed = FALSE
 		ammo.fire_bonus_projectiles(src)
 		bonus_projectile_check = 1 //Mark this projectile as having spawned a set of bonus projectiles.
 
@@ -241,8 +242,11 @@
 	src.speed = speed
 	// Randomize speed by a small factor to help bullet animations look okay
 	// Otherwise you get a   s   t   r   e   a   m of warping bullets in same positions
-	src.speed *= (1 + (rand()-0.5) * 0.30) // 15.0% variance either way
-	src.speed = clamp(src.speed, 0.1, 100) // Safety to avoid loop hazards
+	if (randomize_speed)
+		src.speed *= (1 + (rand()-0.5) * 0.30) // 15.0% variance either way
+
+	// Safety to avoid loop hazards
+	src.speed = clamp(src.speed, 0.1, 100)
 
 	// Also give it some headstart, flying it now ahead of tick
 	var/delta_time = world.tick_lag * rand() * 0.4
@@ -298,7 +302,7 @@
 	var/pixel_x_source = vis_source.x * world.icon_size + vis_source_pixel_x
 	var/pixel_y_source = vis_source.y * world.icon_size + vis_source_pixel_y
 
-	var/turf/vis_target = path[path.len]
+	var/turf/vis_target = path[length(path)]
 	var/pixel_x_target = vis_target.x * world.icon_size + p_x
 	var/pixel_y_target = vis_target.y * world.icon_size + p_y
 
@@ -311,7 +315,7 @@
 
 	//Determine apparent position along visual path, then lerp between start and end positions
 
-	var/vis_length = vis_travelled + path.len
+	var/vis_length = vis_travelled + length(path)
 	var/vis_current = vis_travelled + speed * (time_carry * 0.1) //speed * (time_carry * 0.1) for remainder time movement, visually "catching up" to where it should be
 	var/vis_interpolant = vis_current / vis_length
 
@@ -337,12 +341,6 @@
 
 	//Animate the visuals from starting position to new position
 
-	if(projectile_flags & PROJECTILE_SHRAPNEL) //there can be a LOT of shrapnel especially from a cluster OB, not important enough for the expense of an animate()
-		alpha = alpha_new
-		pixel_x = pixel_x_rel_new
-		pixel_y = pixel_y_rel_new
-		return
-
 	var/anim_time = delta_time * 0.1
 	animate(src, pixel_x = pixel_x_rel_new, pixel_y = pixel_y_rel_new, alpha = alpha_new, time = anim_time, flags = ANIMATION_END_NOW)
 
@@ -357,15 +355,14 @@
 	if((speed * world.tick_lag) >= get_dist(current_turf, target_turf))
 		SEND_SIGNAL(src, COMSIG_BULLET_TERMINAL)
 
-	// Check we can reach the turf at all based on pathed grid
-	var/proj_dir = get_dir(current_turf, next_turf)
-	if((proj_dir & (proj_dir - 1)) && !current_turf.Adjacent(next_turf))
-		ammo.on_hit_turf(current_turf, src)
-		current_turf.bullet_act(src)
-		return TRUE
 
-	// Check for hits that would occur when moving to turf, such as a blocking cade
-	if(scan_a_turf(next_turf, proj_dir))
+	var/list/ignore_list
+	var/obj/item/hardpoint/hardpoint = shot_from
+	if(istype(hardpoint))
+		LAZYOR(ignore_list, hardpoint.owner) //if fired from a vehicle, exclude the vehicle's body from the adjacency check
+
+	// Check we can reach the turf at all based on pathed grid
+	if(check_canhit(current_turf, next_turf, ignore_list))
 		return TRUE
 
 	// Actually move
@@ -379,7 +376,7 @@
 		return TRUE
 
 	// Process on move effects
-	if(distance_travelled == round(ammo.max_range / 2))
+	if(distance_travelled == floor(ammo.max_range / 2))
 		ammo.do_at_half_range(src)
 	if(distance_travelled >= ammo.max_range)
 		ammo.do_at_max_range(src)
@@ -506,7 +503,7 @@
 	if(SEND_SIGNAL(src, COMSIG_BULLET_PRE_HANDLE_MOB, L, .) & COMPONENT_BULLET_PASS_THROUGH)
 		return FALSE
 
-	if((MODE_HAS_TOGGLEABLE_FLAG(MODE_NO_ATTACK_DEAD) && L.stat == DEAD) || (L in permutated))
+	if((MODE_HAS_MODIFIER(/datum/gamemode_modifier/disable_attacking_corpses) && L.stat == DEAD) || (L in permutated))
 		return FALSE
 	permutated |= L
 	if((ammo.flags_ammo_behavior & AMMO_XENO) && (isfacehugger(L) || L.stat == DEAD)) //xeno ammo is NEVER meant to hit or damage dead people. If you want to add a xeno ammo that DOES then make a new flag that makes it ignore this check.
@@ -533,7 +530,8 @@
 
 		else
 			direct_hit = TRUE
-			SEND_SIGNAL(firer, COMSIG_BULLET_DIRECT_HIT, L)
+			if(firer)
+				SEND_SIGNAL(firer, COMSIG_BULLET_DIRECT_HIT, L)
 
 		// At present, Xenos have no inherent effects or localized damage stemming from limb targeting
 		// Therefore we exempt the shooter from direct hit accuracy penalties as well,
@@ -547,7 +545,7 @@
 		to_world(SPAN_DEBUG("([L]) Hit chance: [hit_chance] | Roll: [hit_roll]"))
 		#endif
 
-		if(hit_chance > hit_roll)
+		if(hit_chance > hit_roll && !(L.status_flags & RECENTSPAWN))
 			#if DEBUG_HIT_CHANCE
 			to_world(SPAN_DEBUG("([L]) Hit."))
 			#endif
@@ -599,6 +597,19 @@
 
 	if(SEND_SIGNAL(src, COMSIG_BULLET_POST_HANDLE_MOB, L, .) & COMPONENT_BULLET_PASS_THROUGH)
 		return FALSE
+
+/obj/projectile/proc/check_canhit(turf/current_turf, turf/next_turf, list/ignore_list)
+	var/proj_dir = get_dir(current_turf, next_turf)
+	if((proj_dir & (proj_dir - 1)) && !current_turf.Adjacent(next_turf, ignore_list = ignore_list))
+		ammo.on_hit_turf(current_turf, src)
+		current_turf.bullet_act(src)
+		return TRUE
+
+	// Check for hits that would occur when moving to turf, such as a blocking cade
+	if(scan_a_turf(next_turf, proj_dir))
+		return TRUE
+
+	return FALSE
 
 //----------------------------------------------------------
 				// \\
@@ -828,8 +839,10 @@
 //mobs use get_projectile_hit_chance instead of get_projectile_hit_boolean
 
 /mob/living/proc/get_projectile_hit_chance(obj/projectile/P)
-	if((body_position == LYING_DOWN || HAS_TRAIT(src, TRAIT_NESTED)) && src != P.original)
-		return FALSE // Snowflake check for xeno nests, because we want bullets to fly through even though they're standing in it
+	if(HAS_TRAIT(src, TRAIT_NO_STRAY) && src != P.original)
+		return FALSE
+	if(body_position == LYING_DOWN && src != P.original && world.time - body_position_changed > 0.1 SECONDS)
+		return FALSE // Fixes for buckshot projectiles not hitting stunned targets
 	var/ammo_flags = P.ammo.flags_ammo_behavior | P.projectile_override_flags
 	if(ammo_flags & AMMO_XENO)
 		if((status_flags & XENO_HOST) && HAS_TRAIT(src, TRAIT_NESTED))
@@ -1022,7 +1035,7 @@
 		. = TRUE
 		apply_damage(damage_result, P.ammo.damage_type, P.def_zone, firer = P.firer)
 
-		if(P.ammo.shrapnel_chance > 0 && prob(P.ammo.shrapnel_chance + round(damage / 10)))
+		if(P.ammo.shrapnel_chance > 0 && prob(P.ammo.shrapnel_chance + floor(damage / 10)))
 			if(ammo_flags & AMMO_SPECIAL_EMBED)
 				P.ammo.on_embed(src, organ)
 
@@ -1057,7 +1070,7 @@
 
 	var/ammo_flags = P.ammo.flags_ammo_behavior | P.projectile_override_flags
 
-	if((ammo_flags & AMMO_FLAME) && (src.caste.fire_immunity & FIRE_IMMUNITY_NO_IGNITE|FIRE_IMMUNITY_NO_DAMAGE))
+	if((ammo_flags & AMMO_FLAME) && (caste.fire_immunity & (FIRE_IMMUNITY_NO_IGNITE|FIRE_IMMUNITY_NO_DAMAGE)))
 		to_chat(src, SPAN_AVOIDHARM("You shrug off the glob of flame."))
 		bullet_message(P, damaging = FALSE)
 		return
@@ -1117,11 +1130,11 @@
 		handle_blood_splatter(get_dir(P.starting, loc))
 
 		apply_damage(damage_result,P.ammo.damage_type, P.def_zone) //Deal the damage.
-		if(xeno_shields.len)
+		if(length(xeno_shields))
 			P.play_shielded_hit_effect(src)
 		else
 			P.play_hit_effect(src)
-		if(!stat && prob(5 + round(damage_result / 4)))
+		if(!stat && prob(5 + floor(damage_result / 4)))
 			var/pain_emote = prob(70) ? "hiss" : "roar"
 			emote(pain_emote)
 		updatehealth()
@@ -1164,12 +1177,12 @@
 	switch(P.ammo.damage_type)
 		if(BRUTE) //Rockets do extra damage to walls.
 			if(ammo_flags & AMMO_ROCKET)
-				damage = round(damage * 10)
+				damage = floor(damage * 10)
 		if(BURN)
 			if(ammo_flags & AMMO_ENERGY)
-				damage = round(damage * 7)
+				damage = floor(damage * 7)
 			else if(ammo_flags & AMMO_ANTISTRUCT) // Railgun does extra damage to turfs
-				damage = round(damage * ANTISTRUCT_DMG_MULT_WALL)
+				damage = floor(damage * ANTISTRUCT_DMG_MULT_WALL)
 	if(ammo_flags & AMMO_BALLISTIC)
 		current_bulletholes++
 	take_damage(damage, P.firer)
@@ -1192,13 +1205,13 @@
 
 /obj/item/bullet_act(obj/projectile/P)
 	bullet_ping(P)
-	if(P.ammo.damage_type == BRUTE)
+	if(P.ammo.damage_type == BRUTE && !(P.ammo.flags_ammo_behavior & AMMO_XENO))
 		explosion_throw(P.damage/2, P.dir, 4)
 	return TRUE
 
 /obj/structure/surface/table/bullet_act(obj/projectile/P)
 	bullet_ping(P)
-	health -= round(P.damage/2)
+	health -= floor(P.damage/2)
 	if(health < 0)
 		visible_message(SPAN_WARNING("[src] breaks down!"))
 		deconstruct()

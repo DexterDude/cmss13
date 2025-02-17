@@ -6,6 +6,7 @@
 	anchored = TRUE
 	animate_movement = 1
 	can_buckle = TRUE
+	blocks_emissive = EMISSIVE_BLOCK_GENERIC
 
 	// The mobs that are in each position/seat of the vehicle
 	var/list/mob/seats = list(
@@ -159,10 +160,11 @@
 
 	// Checked here because we want to be able to null the mob in a seat
 	if(!istype(M))
-		return
+		return FALSE
 
 	M.forceMove(src)
 	M.set_interaction(src)
+	return TRUE
 
 /obj/vehicle/proc/turn_on()
 	if(stat)
@@ -246,7 +248,6 @@
 /obj/vehicle/proc/RunOver(mob/living/carbon/human/H)
 	return //write specifics for different vehicles
 
-
 /obj/vehicle/afterbuckle(mob/M)
 	. = ..()
 	if(. && buckled_mob == M)
@@ -257,8 +258,6 @@
 		M.pixel_y = initial(buckled_mob.pixel_y)
 		M.old_y = initial(buckled_mob.pixel_y)
 
-/obj/vehicle/afterbuckle(mob/M)
-	. = ..()
 	if(seats[VEHICLE_DRIVER] == null)
 		seats[VEHICLE_DRIVER] = M
 

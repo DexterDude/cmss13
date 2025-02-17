@@ -55,6 +55,7 @@ GLOBAL_LIST_INIT(damage_boost_vehicles, typecacheof(/obj/vehicle/multitile))
 
 /datum/element/bullet_trait_damage_boost/proc/check_type(atom/A)
 	if(istype(A, /obj/structure/machinery/door)) return "door"
+	else if(istype(A, /turf/closed/wall)) return "wall"
 	//add more cases for other interactions (switch doesn't seem to work with istype)
 	else return 0
 
@@ -73,6 +74,12 @@ GLOBAL_LIST_INIT(damage_boost_vehicles, typecacheof(/obj/vehicle/multitile))
 					active_damage_mult = 1 //no bonus damage
 			else
 				active_damage_mult = damage_mult
+		if("wall")
+			var/turf/closed/wall/hit_wall = hit_atom
+			if(locate(/mob/living) in hit_wall)
+				active_damage_mult = 1 //block bonus damage reflected on mobs from wall turfs
+			else
+				active_damage_mult = damage_mult
 		//add more cases for other interactions
 		else
 			active_damage_mult = damage_mult
@@ -87,7 +94,7 @@ GLOBAL_LIST_INIT(damage_boost_vehicles, typecacheof(/obj/vehicle/multitile))
 		boosted_projectile.damage_boosted-- //Mark that damage has been returned to normal.
 
 	if(damage_boosted_atoms[hit_atom.type]) //If hitting a valid atom for damage boost
-		boosted_projectile.damage = round(boosted_projectile.damage * active_damage_mult) //Modify Damage by multiplier
+		boosted_projectile.damage = floor(boosted_projectile.damage * active_damage_mult) //Modify Damage by multiplier
 
 		if (active_damage_mult)
 			boosted_projectile.last_damage_mult = active_damage_mult //Save multiplier for next check

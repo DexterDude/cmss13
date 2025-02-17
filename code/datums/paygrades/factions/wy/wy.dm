@@ -1,7 +1,7 @@
 /datum/paygrade/wy_ranks
 	name = "WYC Paygrade"
 	pay_multiplier = 1
-	default_faction = FACTION_WEYLAND
+	default_faction = FACTION_WY
 
 /datum/paygrade/wy_ranks/wyc1
 	paygrade = PAY_SHORT_WYC1
@@ -13,6 +13,13 @@
 	paygrade = PAY_SHORT_WYC2
 	name = "Junior Executive"
 	prefix = "Jr. Exec."
+	ranking = 1
+	pay_multiplier = 2
+
+/datum/paygrade/wy_ranks/wycPO
+	paygrade = PAY_SHORT_WYPO2
+	name = "Captain"
+	prefix = "Capt"
 	ranking = 1
 	pay_multiplier = 2
 
@@ -41,7 +48,7 @@
 /datum/paygrade/wy_ranks/wyc6
 	paygrade = PAY_SHORT_WYC6
 	name = "Executive Supervisor"
-	prefix = "Exec. Suvp."
+	prefix = "Exec. Spvsr."
 	ranking = 5
 	pay_multiplier = 6
 	officer_grade = GRADE_OFFICER

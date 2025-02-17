@@ -39,7 +39,7 @@
 			/// The limit of the oxyloss gained, ignoring oxyloss from the switch statement
 			var/maximum_oxyloss = clamp((100 - blood_percentage) / 2, oxyloss, 100)
 			if(oxyloss < maximum_oxyloss)
-				oxyloss += round(max(additional_oxyloss, 0))
+				oxyloss += floor(max(additional_oxyloss, 0))
 
 		switch(b_volume)
 			if(BLOOD_VOLUME_OKAY to BLOOD_VOLUME_SAFE)
@@ -86,9 +86,13 @@
 	name_plural = "Humans"
 	primitive = /mob/living/carbon/human/monkey
 	unarmed_type = /datum/unarmed_attack/punch
-	flags = HAS_SKIN_TONE|HAS_LIPS|HAS_UNDERWEAR|HAS_HARDCRIT
+	flags = HAS_SKIN_TONE|HAS_LIPS|HAS_UNDERWEAR|HAS_HARDCRIT|HAS_SKIN_COLOR
 	mob_flags = KNOWS_TECHNOLOGY
-	uses_ethnicity = TRUE
+	special_body_types = TRUE
+	fire_sprite_prefix = "Standing"
+	fire_sprite_sheet = 'icons/mob/humans/onmob/OnFire.dmi'
+
+	burstscreams = list(MALE = "male_preburst", FEMALE = "female_preburst")
 
 /datum/species/human/handle_on_fire(humanoidmob)
 	. = ..()
