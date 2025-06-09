@@ -19,6 +19,7 @@
 	var/splashable = TRUE
 	flags_atom = FPRINT|OPENCONTAINER
 	transparent = TRUE
+	var/has_lid = TRUE
 
 	var/list/can_be_placed_into = list(
 		/obj/structure/machinery/chem_master/,
@@ -61,6 +62,8 @@
 
 /obj/item/reagent_container/glass/attack_self()
 	..()
+	if(!has_lid)
+		return
 	if(splashable)
 		if(is_open_container())
 			to_chat(usr, SPAN_NOTICE("You put the lid on \the [src]."))
@@ -168,30 +171,35 @@
 			reagents.clear_reagents()
 		return
 
-/obj/item/reagent_container/glass/attackby(obj/item/W as obj, mob/user as mob)
+/obj/item/reagent_container/glass/attackby(obj/item/W, mob/user)
 	if(HAS_TRAIT(W, TRAIT_TOOL_PEN))
 		var/prior_label_text
-		var/datum/component/label/labelcomponent = src.GetComponent(/datum/component/label)
-		if(labelcomponent)
+		var/datum/component/label/labelcomponent = GetComponent(/datum/component/label)
+		if(labelcomponent && labelcomponent.has_label())
 			prior_label_text = labelcomponent.label_name
-		var/tmp_label = sanitize(input(user, "Enter a label for [name]","Label", prior_label_text))
-		if(tmp_label == "" || !tmp_label)
-			if(labelcomponent)
-				labelcomponent.remove_label()
-				user.visible_message(SPAN_NOTICE("[user] removes the label from \the [src]."),
-				SPAN_NOTICE("You remove the label from \the [src]."))
-				return
-			else
-				return
+		var/tmp_label = tgui_input_text(user, "Enter a label for [src] (or nothing to remove)", "Label", prior_label_text, MAX_NAME_LEN, ui_state=GLOB.not_incapacitated_state)
+		if(isnull(tmp_label))
+			return // Canceled
+		if(!tmp_label)
+			if(prior_label_text)
+				log_admin("[key_name(usr)] has removed label from [src].")
+				user.visible_message(SPAN_NOTICE("[user] removes label from [src]."),
+									SPAN_NOTICE("You remove the label from [src]."))
+				labelcomponent.clear_label()
+			return
 		if(length(tmp_label) > MAX_NAME_LEN)
 			to_chat(user, SPAN_WARNING("The label can be at most [MAX_NAME_LEN] characters long."))
-		else
-			user.visible_message(SPAN_NOTICE("[user] labels [src] as \"[tmp_label]\"."),
-			SPAN_NOTICE("You label [src] as \"[tmp_label]\"."))
-			AddComponent(/datum/component/label, tmp_label)
-			playsound(src, "paper_writing", 15, TRUE)
-	else
-		. = ..()
+			return
+		if(prior_label_text == tmp_label)
+			to_chat(user, SPAN_WARNING("The label already says \"[tmp_label]\"."))
+			return
+		user.visible_message(SPAN_NOTICE("[user] labels [src] as \"[tmp_label]\"."),
+		SPAN_NOTICE("You label [src] as \"[tmp_label]\"."))
+		AddComponent(/datum/component/label, tmp_label)
+		playsound(src, "paper_writing", 15, TRUE)
+		return
+
+	return ..()
 
 /obj/item/reagent_container/glass/beaker
 	name = "beaker"
@@ -695,6 +703,7 @@
 	can_be_placed_into = null
 	flags_atom = FPRINT|OPENCONTAINER
 	flags_item = NOBLUDGEON
+	has_lid = FALSE
 
 /obj/item/reagent_container/glass/rag/attack(atom/target, mob/user)
 	if(ismob(target) && target.reagents && reagents.total_volume)

@@ -11,14 +11,14 @@
 /obj/item/clothing/under/marine/veteran/pmc/corporate/hybrisa
 	name = "\improper WY corporate security uniform"
 	desc = "An armored uniform worn by Weyland-Yutani corporate security members. This variant is commonly worn by what are known as 'goons'."
-	icon_state = "hybrisa_uniform"
-	worn_state = "hybrisa_uniform"
+	icon_state = "sec_hybrisa_uniform"
+	worn_state = "sec_hybrisa_uniform"
 	flags_jumpsuit = UNIFORM_SLEEVE_ROLLABLE
 
 /obj/item/clothing/under/marine/veteran/pmc/corporate/hybrisa/lead
 	desc = "An armored uniform worn by Weyland-Yutani corporate security members. This variant is commonly worn by the lead of the 'goonsquad', as they are colloquially known."
-	icon_state = "lead_hybrisa_uniform"
-	worn_state = "lead_hybrisa_uniform"
+	icon_state = "sec_lead_hybrisa_uniform"
+	worn_state = "sec_lead_hybrisa_uniform"
 
 // CMB Police Officer
 
@@ -289,19 +289,24 @@
 /obj/item/clothing/head/helmet/marine/veteran/pmc/corporate/hybrisa
 	name = "\improper WY corporate security helmet"
 	desc = "A basic skull-helm with a orange saftey vison fitted. Worn by corporate security assets, graded to protect your head from an unruly scientist armed with a crowbar."
-	icon_state = "helmet_black"
-	item_state = "helmet_black"
+	icon_state = "sec_helmet_hybrisa"
+	item_state = "sec_helmet_hybrisa"
 
 /obj/item/clothing/head/helmet/marine/veteran/pmc/corporate/hybrisa/lead
 	desc = "A basic skull-helm with a orange saftey vison fitted. Worn by corporate security assets. This variant is worn by low-level guards that have too much brainmatter to fit into the old one. Or so they say."
-	icon_state = "lead_helmet_black"
-	item_state = "lead_helmet_black"
+	icon_state = "sec_lead_helmet_hybrisa"
+	item_state = "sec_lead_helmet_hybrisa"
 
 /obj/item/clothing/head/helmet/marine/veteran/pmc/corporate/hybrisa/brown
 	name = "\improper WY corporate security helmet"
 	desc = "A basic skull-helm with a orange saftey vison fitted. Worn by corporate security assets, graded to protect your head from an unruly scientist armed with a crowbar."
-	icon_state = "helmet_brown"
-	item_state = "helmet_brown"
+	icon_state = "sec_brown_helmet_hybrisa"
+	item_state = "sec_brown_helmet_hybrisa"
+
+/obj/item/clothing/head/helmet/marine/veteran/pmc/corporate/hybrisa/medic
+	desc = "A basic skull-helm with a orange saftey vison fitted. Worn by corporate security assets, graded to protect your head from an unruly scientist armed with a crowbar. A medical cross is emblazoned across the front."
+	icon_state = "sec_medic_helmet_hybrisa"
+	item_state = "sec_medic_helmet_hybrisa"
 
 // CMB Police Hats
 
@@ -617,7 +622,6 @@
 		/obj/item/storage/belt/gun/m39,
 		/obj/item/storage/belt/gun/xm51,
 	)
-	valid_accessory_slots = list(ACCESSORY_SLOT_PONCHO)
 	slowdown = 1
 	flags_inventory = NOPRESSUREDMAGE
 	flags_heat_protection = BODY_FLAG_CHEST|BODY_FLAG_GROIN|BODY_FLAG_LEGS|BODY_FLAG_FEET|BODY_FLAG_ARMS|BODY_FLAG_HANDS
@@ -683,7 +687,6 @@
 		/obj/item/storage/belt/gun/m39,
 		/obj/item/storage/belt/gun/xm51,
 	)
-	valid_accessory_slots = list(ACCESSORY_SLOT_PONCHO)
 
 /obj/item/clothing/suit/storage/marine/light/vest/hybrisa_kelland_alt
 	name = "\improper Kelland-Mining utility uniform"
@@ -725,7 +728,6 @@
 		/obj/item/storage/belt/gun/m39,
 		/obj/item/storage/belt/gun/xm51,
 	)
-	valid_accessory_slots = list(ACCESSORY_SLOT_PONCHO)
 
 // EMT - Paramedic
 
@@ -847,7 +849,6 @@
 	armor_bomb = CLOTHING_ARMOR_LOW
 	armor_bio = CLOTHING_ARMOR_MEDIUM
 	armor_rad = CLOTHING_ARMOR_LOW
-	valid_accessory_slots = list(ACCESSORY_SLOT_ARMOR_A, ACCESSORY_SLOT_ARMOR_L, ACCESSORY_SLOT_ARMOR_S, ACCESSORY_SLOT_ARMOR_M)
 
 /obj/item/clothing/suit/armor/vest/hybrisa/civilian_vest
 	name = "armored vest"
@@ -863,7 +864,6 @@
 	armor_bomb = CLOTHING_ARMOR_LOW
 	armor_bio = CLOTHING_ARMOR_MEDIUM
 	armor_rad = CLOTHING_ARMOR_LOW
-	valid_accessory_slots = list(ACCESSORY_SLOT_ARMOR_A, ACCESSORY_SLOT_ARMOR_L, ACCESSORY_SLOT_ARMOR_S, ACCESSORY_SLOT_ARMOR_M)
 
 // Hazard Vests
 
@@ -1093,7 +1093,6 @@
 	armor_bomb = CLOTHING_ARMOR_LOW
 	armor_bio = CLOTHING_ARMOR_MEDIUM
 	armor_rad = CLOTHING_ARMOR_LOW
-	valid_accessory_slots = list(ACCESSORY_SLOT_ARMOR_A, ACCESSORY_SLOT_ARMOR_L, ACCESSORY_SLOT_ARMOR_S, ACCESSORY_SLOT_ARMOR_M)
 
 /obj/item/clothing/suit/storage/CMB/hybrisa/nspa_jacket
 	name = "\improper NSPA police jacket"

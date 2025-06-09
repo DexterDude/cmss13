@@ -20,6 +20,22 @@
 	var/y_s_offset // Vertical sound offset
 	var/x_s_offset // Horizontal sound offset
 
+/datum/sound_template/proc/get_hearers()
+	var/list/hearers_to_return = list()
+	var/datum/shape/rectangle/zone = SQUARE(x, y, range * 2)
+	hearers_to_return += SSquadtree.players_in_range(zone, z)
+
+	var/turf/above = SSmapping.get_turf_above(locate(x, y, z))
+	while(above)
+		hearers_to_return += SSquadtree.players_in_range(zone, above.z)
+		above = SSmapping.get_turf_above(above)
+
+	var/turf/below = SSmapping.get_turf_below(locate(x, y, z))
+	while(below)
+		hearers_to_return += SSquadtree.players_in_range(zone, below.z)
+		below = SSmapping.get_turf_below(below)
+	return hearers_to_return
+
 /proc/get_free_channel()
 	var/static/cur_chan = 1
 	. = cur_chan++
@@ -400,7 +416,7 @@
 			if("talk_phone")
 				sound = pick('sound/machines/telephone/talk_phone1.ogg', 'sound/machines/telephone/talk_phone2.ogg', 'sound/machines/telephone/talk_phone3.ogg', 'sound/machines/telephone/talk_phone4.ogg', 'sound/machines/telephone/talk_phone5.ogg', 'sound/machines/telephone/talk_phone6.ogg', 'sound/machines/telephone/talk_phone7.ogg')
 			if("bone_break")
-				sound = pick('sound/effects/bone_break1.ogg','sound/effects/bone_break2.ogg','sound/effects/bone_break3.ogg','sound/effects/bone_break4.ogg','sound/effects/bone_break5.ogg','sound/effects/bone_break6.ogg','sound/effects/bone_break7.ogg')
+				sound = pick('sound/effects/bone_break1.ogg','sound/effects/bone_break2.ogg','sound/effects/bone_break3.ogg','sound/effects/bone_break4.ogg','sound/effects/bone_break5.ogg','sound/effects/bone_break6.ogg','sound/effects/bone_break7.ogg','sound/effects/crack1.ogg', 'sound/effects/crack2.ogg', 'sound/effects/crackandbleed.ogg')
 			if("plush")
 				sound = pick('sound/items/plush1.ogg', 'sound/items/plush2.ogg', 'sound/items/plush3.ogg')
 			// working joe
@@ -419,8 +435,6 @@
 				sound = pick('sound/voice/pred_pain_rare1.ogg')
 			if("pred_death")
 				sound = pick('sound/voice/pred_death1.ogg', 'sound/voice/pred_death2.ogg')
-			if("pred_laugh4")
-				sound = pick('sound/voice/pred_laugh4.ogg', 'sound/voice/pred_laugh5.ogg')
 			if("clownstep")
 				sound = pick('sound/effects/clownstep1.ogg', 'sound/effects/clownstep2.ogg')
 			if("giant_lizard_growl")
@@ -429,6 +443,12 @@
 				sound = pick('sound/effects/giant_lizard_hiss1.ogg', 'sound/effects/giant_lizard_hiss2.ogg')
 			if("evo_screech")
 				sound = pick('sound/voice/alien_echoroar_1.ogg', 'sound/voice/alien_echoroar_2.ogg', 'sound/voice/alien_echoroar_3.ogg')
+			if("wy_droid_pain")
+				sound = pick('sound/voice/wy_droid/wy_droid_pain1.ogg', 'sound/voice/wy_droid/wy_droid_pain2.ogg', 'sound/voice/wy_droid/wy_droid_pain3.ogg', 'sound/voice/wy_droid/wy_droid_pain4.ogg', 'sound/voice/wy_droid/wy_droid_pain5.ogg')
+			if("wy_droid_death")
+				sound = pick('sound/voice/wy_droid/wy_droid_death1.ogg', 'sound/voice/wy_droid/wy_droid_death2.ogg', 'sound/voice/wy_droid/wy_droid_death3.ogg', 'sound/voice/wy_droid/wy_droid_death4.ogg', 'sound/voice/wy_droid/wy_droid_death5.ogg', 'sound/voice/wy_droid/wy_droid_death6.ogg', 'sound/voice/wy_droid/wy_droid_death7.ogg')
+			if("wy_droid_cloaker_death")
+				sound = pick('sound/voice/wy_droid/wy_stealth_droid_death1.ogg', 'sound/voice/wy_droid/wy_stealth_droid_death2.ogg')
 	return sound
 
 /client/proc/generate_sound_queues()
