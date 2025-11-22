@@ -799,6 +799,7 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 #define RAIDER_OFFICER_SQUAD "SOF [JOB_MARINE_RAIDER_CMD]"
 #define RAIDER_SL_SQUAD "SOF [JOB_MARINE_RAIDER_SL]"
 #define RAIDER_SQUAD "SOF [JOB_MARINE_RAIDER]"
+#define RAIDER_SG_SQUAD "SOF [JOB_MARINE_RAIDER_SG]"
 
 /datum/crewmonitor
 	/// List of user -> UI source
@@ -961,17 +962,20 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 		if(FACTION_MARINE)
 			jobs = list(
 				// Note that jobs divisible by 10 are considered heads of staff, and bolded
-				// 00-09: High Command, defined at bottom
-				JOB_CMC = 00,//Grade O10
-				JOB_ACMC = 00,
-				JOB_PROVOST_CMARSHAL = 00,
-				JOB_GENERAL = 00,
-				JOB_PROVOST_SMARSHAL = 01,//Grade O9
-				JOB_PROVOST_MARSHAL = 02,//Grade O7
-				JOB_PROVOST_DMARSHAL = 03,//Grade O6
-				JOB_COLONEL = 04,//Grade O6
-				JOB_PROVOST_CINSPECTOR = 05,
-				JOB_PROVOST_INSPECTOR = 06,
+				// 0-9: High Command, defined at bottom
+				JOB_CMC = 0,//Grade O10
+				JOB_ACMC = 0,
+				JOB_PROVOST_CMARSHAL = 0,
+				JOB_GENERAL = 0,
+				JOB_PROVOST_SMARSHAL = 1,//Grade O9
+				JOB_PROVOST_MARSHAL = 2,//Grade O7
+				JOB_PROVOST_DMARSHAL = 3,//Grade O6
+				JOB_COLONEL = 4,//Grade O6
+				JOB_PROVOST_CINSPECTOR = 5,
+				JOB_PROVOST_INSPECTOR = 6,
+				JOB_CIA_UACQS_COMR = 7,
+				JOB_CIA_UACQS_ADMN = 8,
+				JOB_CIA_UACQS_SEC = 9,
 				// 10-19: Command
 				JOB_CO = 10,
 				JOB_XO = 11,
@@ -979,6 +983,7 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 				RAIDER_OFFICER_SQUAD = 11,
 				JOB_SO = 12,
 				JOB_SEA = 13,
+				JOB_SYNTH_CMD = 14,
 				// 20-29: Aux Command
 				JOB_AUXILIARY_OFFICER = 20,
 				JOB_SYNTH = 21,
@@ -986,41 +991,48 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 				JOB_DROPSHIP_PILOT = 23,
 				JOB_DROPSHIP_CREW_CHIEF = 24,
 				JOB_INTEL = 25,
-				JOB_TANK_CREW = 26,
+				JOB_SYNTH_INTEL = 25,
+				JOB_CIA_LIAISON = 26,
+				JOB_TANK_CREW = 27,
 				// 30-39: Security
 				JOB_CHIEF_POLICE = 30,
 				JOB_PROVOST_TML = 30,
 				JOB_WARDEN = 31,
 				JOB_PROVOST_ENFORCER = 31,
+				JOB_POLICE_HG = 32,
 				JOB_RIOT_CHIEF = 32,
 				JOB_RIOT = 33,
 				JOB_POLICE = 34,
-				JOB_PROVOST_ADVISOR = 35,
+				JOB_SYNTH_MP = 35,
+				JOB_PROVOST_ADVISOR = 36,
 				// 40-49: MedSci
 				JOB_CMO = 40,
 				JOB_RESEARCHER = 41,
 				JOB_DOCTOR = 42,
 				JOB_SURGEON = 42,
 				JOB_FIELD_DOCTOR = 43,
-				JOB_NURSE = 44,
+				JOB_SYNTH_MED = 44,
+				JOB_NURSE = 45,
 				// 50-59: Engineering
 				JOB_CHIEF_ENGINEER = 50,
-				JOB_ORDNANCE_TECH = 51,
-				JOB_MAINT_TECH = 52,
+				JOB_SYNTH_ENG = 51,
+				JOB_ORDNANCE_TECH = 52,
+				JOB_MAINT_TECH = 53,
 				// 60-69: Cargo
 				JOB_CHIEF_REQUISITION = 60,
 				JOB_CARGO_TECH = 61,
 				JOB_MESS_SERGEANT = 62,
-				// 70-139: SQUADS (look below)
+				// 70-149: SQUADS (look below)
 				JOB_SYNTH_K9 = 71,
-				// 140+: Civilian/other
-				JOB_CORPORATE_LIAISON = 140,
-				JOB_PASSENGER = 141,
+				// 150+: Civilian/other
+				JOB_CORPORATE_LIAISON = 150,
+				JOB_CIA = 151,
+				JOB_PASSENGER = 152,
 				// Non Almayer jobs lower then registered
-				JOB_SYNTH_SURVIVOR = 150,
-				JOB_SURVIVOR = 151,
-				JOB_COLONIST = 152,
-				JOB_WORKING_JOE = 153,
+				JOB_SYNTH_SURVIVOR = 160,
+				JOB_SURVIVOR = 161,
+				JOB_COLONIST = 162,
+				JOB_WORKING_JOE = 163,
 
 				// WO jobs
 				// 10-19: Command
@@ -1043,10 +1055,10 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 				// 60-69: Cargo
 				JOB_WO_CHIEF_REQUISITION = 60,
 				JOB_WO_REQUISITION = 61,
-				// 70-139: SQUADS (look below)
-				// 140+: Civilian/other
-				JOB_WO_CORPORATE_LIAISON = 140,
-				JOB_WO_SYNTH = 150,
+				// 70-149: SQUADS (look below)
+				// 150+: Civilian/other
+				JOB_WO_CORPORATE_LIAISON = 150,
+				JOB_WO_SYNTH = 160,
 
 				// ANYTHING ELSE = UNKNOWN_JOB_ID, Unknowns/custom jobs will appear after civilians, and before stowaways
 				JOB_STOWAWAY = 999,
@@ -1074,7 +1086,17 @@ GLOBAL_LIST_EMPTY_TYPED(crew_monitor, /datum/crewmonitor)
 				JOB_MARINE_RAIDER_SL = 130,
 				RAIDER_SL_SQUAD = 130,
 				JOB_MARINE_RAIDER = 131,
-				RAIDER_SQUAD = 131,
+				JOB_MARINE_RAIDER_SG = 132,
+				RAIDER_SQUAD = 132,
+
+				JOB_FORECON_CO = 140,
+				JOB_FORECON_SL = 140,
+				JOB_FORECON_SNIPER = 141,
+				JOB_FORECON_MARKSMAN = 142,
+				JOB_FORECON_SMARTGUNNER = 143,
+				JOB_FORECON_SUPPORT = 144,
+				JOB_FORECON_RIFLEMAN = 145,
+				JOB_FORECON_SYN = 146,
 			)
 			var/squad_number = 70
 			for(var/squad_name in GLOB.ROLES_SQUAD_ALL + "")
